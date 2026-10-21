@@ -63,13 +63,15 @@ The connection is anonymous and read-only.
   Barcelona y enlaza sus productores.”
 - “For my restaurant in Girona, find cheese producers within 40 km that sell to
   restaurants, with their profiles and contact links.”
+- “I want to buy goat cheese online from a maker near Vic; show me the ones with
+  their own shop.”
 - With an image-capable host: “List the producers and products in this shelf
   photo in order, link the ones Chisan has and prepare the missing ones as
   research leads.”
 
 The skills ask the assistant to cite each producer's or event's Chisan page and
-to answer a request to buy, pay, book or send a message with the producer's
-recorded channels instead of an action.
+to route a request to buy, pay, book or send a message to the producer's
+recorded channels; Chisan itself never performs it.
 
 ## What Chisan does and does not provide
 
@@ -80,7 +82,11 @@ recorded channels instead of an action.
   the producer or organizer.
 - Proximity uses named public places from the catalog. The plugin never asks for
   or uses the device position or a home address.
-- The plugin cannot order, pay, book, send messages, edit Chisan or save
+- Chisan is the discovery step; buying happens directly with the producer.
+  Hosts that can browse may continue to the producer's own shop and complete a
+  purchase with your approval, at the producer's prices and terms. Chisan takes
+  no part in that transaction and receives no payment or commission from it.
+- The plugin itself cannot order, pay, book, send messages, edit Chisan or save
   research leads. Contact links prepare a call, email or message for the person
   to open. Producers of age-restricted drinks are informational only, without
   shop or external contact links.
