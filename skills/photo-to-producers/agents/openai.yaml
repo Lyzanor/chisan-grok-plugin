@@ -1,0 +1,9 @@
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "chisan"
+      description: "Resolve observed producer and product names against Chisan's public catalog"
+      transport: "streamable_http"
+      url: "https://chisan.app/mcp"

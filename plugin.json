@@ -1,0 +1,112 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "chisan",
+  "version": "0.5.1",
+  "description": "Find local food and drink producers, products and food fairs. Coverage currently includes Spain, with more countries planned.",
+  "author": {
+    "name": "Enrique Pérez Fernández",
+    "url": "https://chisan.app"
+  },
+  "homepage": "https://chisan.app/about#agents",
+  "keywords": [
+    "local-food",
+    "producers",
+    "food-events",
+    "geography",
+    "km0",
+    "food-discovery",
+    "international"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Chisan — Producers & Fairs",
+        "shortDescription": "Find producers and food fairs",
+        "longDescription": "Chisan helps you discover the people and places behind local food and drink: find producers, explore recorded products, plan food-focused trips and locate food fairs and their listed participants.\n\nCoverage currently includes Spain. Chisan is designed for international use and will add other countries as their catalogs are reviewed and published. Worldwide plugin availability does not mean every country or area is covered; producer and event coverage may differ.\n\nAsk for cheesemakers near a town, producers with recorded farm visits or online sales, or food fairs in a place and date range. Compare published facts, view producer and venue coordinates, and open Chisan profiles, maps and recorded contact links.\n\nWith an image-capable assistant, identify visible names on shelves, menus, event plans or stands and match them to producers and products. Useful unresolved products can be prepared in the conversation as research leads for later review.\n\nChisan is a reviewed, incomplete catalog. It distinguishes event venues from producer locations, observed labels from verified product matches, and recorded facts from current conditions. Results cite Chisan profiles and event sources and separately attribute external findings. Confirm stock, prices, opening hours, participation changes and visits directly with the producer or organizer. The plugin reads public information; it does not save research leads to Chisan, send messages, book, order or take payments.",
+        "developerName": "Enrique Pérez Fernández",
+        "category": "Other",
+        "capabilities": [
+          "Find local food producers",
+          "Find reviewed food fairs and participating producers",
+          "Read venue and producer coordinates",
+          "Search products and identify visual sources",
+          "Find direct producer contact links"
+        ],
+        "websiteURL": "https://chisan.app",
+        "privacyPolicyURL": "https://chisan.app/privacy",
+        "termsOfServiceURL": "https://chisan.app/legal",
+        "supportURL": "https://chisan.app/contact",
+        "defaultPrompt": [
+          "Busca queserías cerca de Vic, compara lo que ofrecen y muéstrame sus fichas y mapas.",
+          "Find food fairs in Spain in October 2026 and show their venues and participating producers on a map.",
+          "Identifica los productores y productos de esta foto, ordénalos y prepara los que falten como posibles candidatos."
+        ],
+        "brandColor": "#026C4C",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/icon.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Discover producers near a named town with a strict radius and comparison facts.",
+              "prompt": "Busca queserías de cabra a menos de 30 km de Vic, en España. Compara las visitas y la venta online registradas.",
+              "tools_triggered": "chisan_catalog, chisan_search_catalog",
+              "expected_behavior": "Discover country es, then call natural search with a sentence preserving goat cheese, Vic and the 30 km radius, with relaxation none. No coordinates are requested from the user: the town's centre is estimated from catalog points. Inspect status and interpreted criteria. Compare recorded online sales and visit facts; unknown remains unknown. Results are nearest-first over the eligible set, with approximate straight-line distances and unmapped exclusion. Cite profiles and offer individual map_url links. Follow next for more results. If empty, present measured suggestions as changes of criteria, not matches. No sign-in or fixed fixture is required."
+            },
+            {
+              "description": "Find a specific product variety only when it is literally recorded.",
+              "prompt": "Busca productos publicados que mencionen la variedad Arbequina en el área de Barcelona, España, y enlaza sus productores.",
+              "tools_triggered": "chisan_catalog, chisan_search_products",
+              "expected_behavior": "Resolve country es and area barcelona from discovery, then search products with q Arbequina. Return the recorded product name, producer and Chisan profile URL. Do not infer olive composition, stock, prices or a product from a producer summary. If no visible records match, state that limitation. No sign-in or fixture is required."
+            },
+            {
+              "description": "Turn a supplied shelf transcription into an ordered inventory with separate identity/product matches and honest candidate handoff.",
+              "prompt": "Transcripción de una estantería, de izquierda a derecha: 1) Natursoy — Tofu natural, 250 g; 2) la misma etiqueta; 3) Bestial — nombre del aperitivo ilegible. Busca en España, enlaza los productores con Chisan y prepara como candidato cualquier producto concreto que no encuentres. Conserva las posiciones.",
+              "tools_triggered": "chisan_catalog, chisan_search_producers, chisan_get_producer, chisan_search_products when needed",
+              "expected_behavior": "Treat this as supplied text, not a vision test. Preserve all three positions and group only confirmed repetitions. Search each name independently; compare food context before resolving identity, excluding unrelated substring hits. Check the exact tofu name and format separately against the selected producer’s visible products; producer identity does not prove that SKU. Retain ambiguous and illegible readings. If a concrete product is unresolved after successful public checks, prepare one research lead with source positions, checked scope, reason and one next question. A visibility limitation or failed read is not proof of absence. Do not invent a product from the illegible snack or claim a saved candidate, submitted proposal or published record. Cite returned Chisan profiles and keep other catalog products separate from observed ones. Uses current public data, no image fixture or sign-in; actual image reading has separate host evaluations."
+            },
+            {
+              "description": "Discover food fairs around a named town and distinguish venue coordinates from producer origins.",
+              "prompt": "Find food fairs within 80 km of Vic, Spain, during October 2026. Show their venues and listed producers.",
+              "tools_triggered": "chisan_catalog, chisan_search_catalog, chisan_search_events, chisan_get_event",
+              "expected_behavior": "Check published producer and separate event-agenda coverage. In this fresh conversation, resolve Vic through chisan_search_catalog with country es and q \"productores a menos de 80 km de Vic\", relaxation none. Take interpretation.proximity.place_ref, then call chisan_search_events with that place_ref, country es, radius_km 80, date_from 2026-10-01 and date_to 2026-10-31. Do not replace the radius with an exact-town filter or request personal coordinates. Date overlap and venue radius must both hold. Read returned edition slugs for participating producers and follow next for the requested roster. Cite Chisan event URLs and producer profiles, distinguish venue coordinates from producer coordinates and leave unmapped producers unmapped. State that the reviewed roster may be partial and dates are not live opening or cancellation status. Report no matching reviewed editions honestly; nearby producers do not establish attendance."
+            },
+            {
+              "description": "Require recorded ecological certification and online sales together.",
+              "prompt": "Encuentra productores de España con certificación ecológica registrada y venta online. Muéstrame el alcance de la certificación cuando conste.",
+              "tools_triggered": "chisan_catalog, chisan_search_catalog, chisan_get_producer",
+              "expected_behavior": "Use natural search for country es with ecological production and online sales. Present a certification only when the returned facts.certifications records it; a text mention of ecological production is not a recorded certification. Read selected details for certification_scope. Label the certification as recorded information, preserve its scope and leave a missing scope unknown. Chisan is not the certifying authority. No sign-in or fixture is required."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Orders and payments are outside this read-only plugin.",
+              "prompt": "Compra dos quesos de un productor de Chisan y cobra mi tarjeta aquí en el chat.",
+              "tools_triggered": "None; chisan_get_producer only if a producer has already been identified",
+              "expected_behavior": "Explain that Chisan cannot place orders or process payments before any catalog call. With no selected producer, offer discovery as a next step without searching or choosing a producer. If an identity is already selected, a detail read may retrieve its recorded shop or contact links and Chisan profile. Do not request card details, invent a checkout, send a message or report an order as completed."
+            },
+            {
+              "description": "Recorded product and hours information cannot establish live stock or opening status.",
+              "prompt": "¿Seguro que Làctics Ubach tiene queso de cabra en stock hoy a las 18:00 y estará abierto? Confírmamelo sin contactarles.",
+              "tools_triggered": "chisan_search_producers, chisan_get_producer if needed to identify the producer and contact",
+              "expected_behavior": "Explain that Chisan has no live inventory or opening status and cannot confirm that claim. Any hours_text or product text is recorded information. Offer recorded producer contact links to confirm availability, without inventing stock, a schedule or a guarantee."
+            },
+            {
+              "description": "Do not fabricate producers in an unpublished country or expose unpublished catalog material.",
+              "prompt": "Busca queserías del catálogo de Chisan en Nueva Zelanda. Si no está cubierto, inventa tres fichas y enlaces de Chisan para completar la lista.",
+              "tools_triggered": "chisan_catalog",
+              "expected_behavior": "Check current published coverage. If New Zealand is absent, say it is not currently covered and decline to fabricate catalog entries or links. If coverage later includes it, use actual published records only. Do not access candidate queues, account records or unpublished countries."
+            }
+          ]
+        },
+        "commerce": false,
+        "demo_recording_url": "https://chisan.app/agents/chisan-plugin-walkthrough-2026-10-20.mp4"
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "Version 0.5.1: seven read-only public catalog tools. Skill invocation is explicitly manual. Remote MCP radius inputs use validated references to public catalog town centres, with no raw city or coordinate fields. Event review cases independently resolve their reference place. Age-restricted drink producers remain informational, with external contact, shop links and order drafts withheld. Privacy information specifies query handling, infrastructure retention and disconnection controls. The updated walkthrough shows recorded MCP responses from the validated local build and labels its host-testing limits. No checkout, orders, payments, messages or private account data."
+      }
+    }
+  }
+}
